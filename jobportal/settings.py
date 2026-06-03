@@ -12,7 +12,13 @@ ENVIRONMENT = config('ENVIRONMENT', default='development')
 # Security settings
 SECRET_KEY = config('SECRET_KEY', default='django-insecure-key-default-2026')
 DEBUG = config('DEBUG', default=False, cast=bool)
-ALLOWED_HOSTS = [host.strip() for host in config('ALLOWED_HOSTS', default='localhost,127.0.0.1,bollo.onrender.com').split(',') if host.strip()]
+ALLOWED_HOSTS = [host.strip() for host in config('ALLOWED_HOSTS', default='localhost,127.0.0.1,bollo.onrender.com,testserver').split(',') if host.strip()]
+
+render_url = os.environ.get('RENDER_EXTERNAL_URL')
+if render_url:
+    render_host = render_url.replace('https://', '').replace('http://', '').strip('/')
+    if render_host and render_host not in ALLOWED_HOSTS:
+        ALLOWED_HOSTS.append(render_host)
 
 # Application definition
 INSTALLED_APPS = [
