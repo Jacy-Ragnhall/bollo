@@ -1,0 +1,95 @@
+{% extends 'base.html' %}
+{% block title %}Sign Up - Bolloh{% endblock %}
+
+{% block content %}
+<div class="container my-5 d-flex justify-content-center align-items-center">
+    <div class="glass-card p-5 shadow w-100" style="max-width: 520px;">
+        
+        <div class="text-center mb-4">
+            <span class="brand-font fs-2 text-white"><i class="fa-solid fa-bolt text-info me-2"></i>Bolloh</span>
+            <p class="text-white-50 small mt-2">Sign up for a secure candidate or employer profile.</p>
+        </div>
+
+        <form method="POST" action="{% url 'users:signup' %}">
+            {% csrf_token %}
+            
+            {% if form.non_field_errors %}
+                <div class="alert alert-danger py-2 small">{{ form.non_field_errors }}</div>
+            {% endif %}
+
+            <div class="mb-3">
+                <label class="form-label text-white-50 small">Username</label>
+                <div class="input-group">
+                    <span class="input-group-text bg-dark border-secondary text-white-50"><i class="fa-solid fa-user-astronaut"></i></span>
+                    <input type="text" name="username" class="form-control form-control-custom" placeholder="Pick a username" value="{{ form.username.value|default:'' }}" required>
+                </div>
+                {% if form.username.errors %}
+                    <div class="text-danger small mt-1">{{ form.username.errors }}</div>
+                {% endif %}
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label text-white-50 small">Email Address</label>
+                <div class="input-group">
+                    <span class="input-group-text bg-dark border-secondary text-white-50"><i class="fa-solid fa-envelope"></i></span>
+                    <input type="email" name="email" class="form-control form-control-custom" placeholder="e.g. john@example.com" value="{{ form.email.value|default:'' }}" required>
+                </div>
+                {% if form.email.errors %}
+                    <div class="text-danger small mt-1">{{ form.email.errors }}</div>
+                {% endif %}
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label text-white-50 small">Password</label>
+                <div class="input-group">
+                    <span class="input-group-text bg-dark border-secondary text-white-50"><i class="fa-solid fa-lock"></i></span>
+                    <input type="password" name="password1" class="form-control form-control-custom" placeholder="Choose a password" required>
+                </div>
+                {% if form.password1.errors %}
+                    <div class="text-danger small mt-1">{{ form.password1.errors }}</div>
+                {% endif %}
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label text-white-50 small">Confirm Password</label>
+                <div class="input-group">
+                    <span class="input-group-text bg-dark border-secondary text-white-50"><i class="fa-solid fa-circle-check"></i></span>
+                    <input type="password" name="password2" class="form-control form-control-custom" placeholder="Re-enter password" required>
+                </div>
+            </div>
+
+            <!-- Custom Role selection -->
+            <div class="mb-4">
+                <label class="form-label text-white-50 small d-block mb-2">Select Your Role</label>
+                <div class="row g-2">
+                    <div class="col-6">
+                        <input type="radio" class="btn-check" name="role" id="roleSeeker" value="seeker" checked autocomplete="off">
+                        <label class="btn btn-outline-info w-100 py-3 rounded-4 d-flex flex-column align-items-center gap-2" for="roleSeeker">
+                            <i class="fa-solid fa-user-tie fs-3"></i>
+                            <span class="fw-medium small">Job Seeker</span>
+                        </label>
+                    </div>
+                    <div class="col-6">
+                        <input type="radio" class="btn-check" name="role" id="roleEmployer" value="employer" autocomplete="off">
+                        <label class="btn btn-outline-info w-100 py-3 rounded-4 d-flex flex-column align-items-center gap-2" for="roleEmployer">
+                            <i class="fa-solid fa-building-user fs-3"></i>
+                            <span class="fw-medium small">Employer</span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="d-grid mb-4">
+                <button type="submit" class="btn btn-primary-gradient rounded-3 py-2"><i class="fa-solid fa-user-plus me-2"></i> Create Account</button>
+            </div>
+            
+            <hr class="border-secondary mb-4">
+
+            <div class="text-center small text-white-50">
+                Already registered? <a href="{% url 'users:login' %}" class="text-info text-decoration-none fw-medium">Log In</a>
+            </div>
+
+        </form>
+    </div>
+</div>
+{% endblock %}

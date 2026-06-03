@@ -1,0 +1,88 @@
+{% extends 'base.html' %}
+{% block title %}{{ action }} Job Listing - Bolloh{% endblock %}
+
+{% block content %}
+<div class="container my-4" style="max-width: 800px;">
+    <div class="glass-card p-5 shadow">
+        
+        <h2 class="text-white mb-2"><i class="fa-solid fa-file-pen text-info me-2"></i> {{ action }} Job Listing</h2>
+        <p class="text-white-50 mb-4">Post a new position. New jobs require a payment of $99 and moderator approval before going live.</p>
+        
+        <form method="POST">
+            {% csrf_token %}
+            
+            <!-- General Fields Grid -->
+            <div class="row g-3 mb-4">
+                <div class="col-md-12">
+                    <label class="form-label text-white-50 small">Job Title</label>
+                    {{ form.title }}
+                    {% if form.title.errors %}
+                        <div class="text-danger small mt-1">{{ form.title.errors }}</div>
+                    {% endif %}
+                </div>
+                
+                <div class="col-md-6">
+                    <label class="form-label text-white-50 small">Category</label>
+                    {{ form.category }}
+                    {% if form.category.errors %}
+                        <div class="text-danger small mt-1">{{ form.category.errors }}</div>
+                    {% endif %}
+                </div>
+                
+                <div class="col-md-6">
+                    <label class="form-label text-white-50 small">Job Type</label>
+                    {{ form.job_type }}
+                    {% if form.job_type.errors %}
+                        <div class="text-danger small mt-1">{{ form.job_type.errors }}</div>
+                    {% endif %}
+                </div>
+                
+                <div class="col-md-12">
+                    <label class="form-label text-white-50 small">Location</label>
+                    {{ form.location }}
+                    {% if form.location.errors %}
+                        <div class="text-danger small mt-1">{{ form.location.errors }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label text-white-50 small">Min Annual Salary ($)</label>
+                    {{ form.salary_min }}
+                    {% if form.salary_min.errors %}
+                        <div class="text-danger small mt-1">{{ form.salary_min.errors }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label text-white-50 small">Max Annual Salary ($)</label>
+                    {{ form.salary_max }}
+                    {% if form.salary_max.errors %}
+                        <div class="text-danger small mt-1">{{ form.salary_max.errors }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="col-md-12">
+                    <label class="form-label text-white-50 small">Description & Requirements</label>
+                    {{ form.description }}
+                    {% if form.description.errors %}
+                        <div class="text-danger small mt-1">{{ form.description.errors }}</div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Submit actions -->
+            <div class="d-flex gap-3 justify-content-end align-items-center">
+                <a href="{% url 'jobs:employer_dashboard' %}" class="btn btn-outline-secondary rounded-pill px-4">Cancel</a>
+                <button type="submit" class="btn btn-primary-gradient rounded-pill px-5">
+                    {% if action == 'Create' %}
+                        Proceed to Payment
+                    {% else %}
+                        Save Changes
+                    {% endif %}
+                </button>
+            </div>
+            
+        </form>
+    </div>
+</div>
+{% endblock %}

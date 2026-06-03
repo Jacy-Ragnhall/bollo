@@ -1,0 +1,95 @@
+{% extends 'base.html' %}
+{% block title %}Resume Builder - Bolloh{% endblock %}
+
+{% block content %}
+<div class="container my-4" style="max-width: 800px;">
+    <div class="glass-card p-5 shadow">
+        
+        <h2 class="text-white mb-2"><i class="fa-solid fa-file-invoice text-info me-2"></i> Professional Resume Builder</h2>
+        <p class="text-white-50 mb-4">Complete the fields below to construct a high-fidelity PDF resume. The system will compile, download, and automatically attach this document to your profile.</p>
+
+        <form method="POST">
+            {% csrf_token %}
+            
+            <div class="row g-3 mb-4">
+                <div class="col-md-12">
+                    <h5 class="text-white border-bottom border-secondary pb-2 mb-3"><i class="fa-solid fa-address-card text-primary-gradient me-2"></i> 1. Contact Information</h5>
+                </div>
+                
+                <div class="col-md-6">
+                    <label class="form-label text-white-50 small">Full Name</label>
+                    {{ form.full_name }}
+                    {% if form.full_name.errors %}
+                        <div class="text-danger small mt-1">{{ form.full_name.errors }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label text-white-50 small">Email Address</label>
+                    {{ form.email }}
+                    {% if form.email.errors %}
+                        <div class="text-danger small mt-1">{{ form.email.errors }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label text-white-50 small">Phone Number</label>
+                    {{ form.phone }}
+                    {% if form.phone.errors %}
+                        <div class="text-danger small mt-1">{{ form.phone.errors }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="col-md-12">
+                    <h5 class="text-white border-bottom border-secondary pb-2 mb-3 mt-4"><i class="fa-solid fa-user-check text-primary-gradient me-2"></i> 2. Professional Profile</h5>
+                </div>
+
+                <div class="col-md-12">
+                    <label class="form-label text-white-50 small">Summary Statement</label>
+                    {{ form.summary }}
+                    {% if form.summary.errors %}
+                        <div class="text-danger small mt-1">{{ form.summary.errors }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="col-md-12">
+                    <h5 class="text-white border-bottom border-secondary pb-2 mb-3 mt-4"><i class="fa-solid fa-briefcase text-primary-gradient me-2"></i> 3. Experience & Credentials</h5>
+                </div>
+
+                <div class="col-md-12">
+                    <label class="form-label text-white-50 small">Work Experience</label>
+                    {{ form.experience }}
+                    <div class="form-text text-muted small">List companies, roles, and bullet-points on new lines.</div>
+                    {% if form.experience.errors %}
+                        <div class="text-danger small mt-1">{{ form.experience.errors }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="col-md-12">
+                    <label class="form-label text-white-50 small">Education History</label>
+                    {{ form.education }}
+                    {% if form.education.errors %}
+                        <div class="text-danger small mt-1">{{ form.education.errors }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="col-md-12">
+                    <label class="form-label text-white-50 small">Key Skills</label>
+                    {{ form.skills }}
+                    <div class="form-text text-muted small">Comma-separated list (e.g. Python, Django, AWS, React)</div>
+                    {% if form.skills.errors %}
+                        <div class="text-danger small mt-1">{{ form.skills.errors }}</div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Action buttons -->
+            <div class="d-flex gap-3 justify-content-end align-items-center">
+                <a href="{% url 'users:profile' %}" class="btn btn-outline-secondary rounded-pill px-4">Cancel</a>
+                <button type="submit" class="btn btn-primary-gradient rounded-pill px-5"><i class="fa-solid fa-download me-1"></i> Generate & Download PDF</button>
+            </div>
+
+        </form>
+    </div>
+</div>
+{% endblock %}

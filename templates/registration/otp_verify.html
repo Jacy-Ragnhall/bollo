@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+{% block title %}Verify 2FA - Bolloh{% endblock %}
+
+{% block content %}
+<div class="container my-5 d-flex justify-content-center align-items-center">
+    <div class="glass-card p-5 shadow w-100" style="max-width: 440px;">
+        
+        <div class="text-center mb-4">
+            <i class="fa-solid fa-key text-info display-4 mb-3 animate-pulse"></i>
+            <h2 class="text-white mb-2">Two-Factor Authentication</h2>
+            <p class="text-white-50 small mt-2">Enter the active 6-digit verification code from your authenticator device.</p>
+        </div>
+
+        <form method="POST">
+            {% csrf_token %}
+            
+            <div class="mb-4">
+                {{ form.token }}
+                {% if form.token.errors %}
+                    <div class="text-danger small mt-1 text-center">{{ form.token.errors }}</div>
+                {% endif %}
+            </div>
+
+            <div class="d-grid mb-3">
+                <button type="submit" class="btn btn-primary-gradient rounded-3 py-2"><i class="fa-solid fa-unlock-keyhole me-1"></i> Verify & Authenticate</button>
+            </div>
+            
+            <div class="text-center">
+                <a href="{% url 'users:login' %}" class="small text-white-50 text-decoration-none"><i class="fa-solid fa-arrow-left"></i> Return to login screen</a>
+            </div>
+
+        </form>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+{% block title %}Job Approvals Moderation - Admin{% endblock %}
+
+{% block content %}
+<div class="container my-4">
+    <h2 class="text-white mb-2"><i class="fa-solid fa-shield-halved text-danger me-2"></i> Moderation Portal</h2>
+    <p class="text-white-50 mb-5">Admin moderation dashboard. Review paid job vacancies and approve them to put them live on the search engine.</p>
+
+    <div class="glass-card p-4 shadow">
+        <h4 class="text-white mb-4"><i class="fa-solid fa-clock-rotate-left text-warning me-2 animate-pulse"></i> Pending Approval Queue</h4>
+        
+        <div class="table-responsive">
+            <table class="table table-dark table-hover align-middle border-secondary table-borderless">
+                <thead>
+                    <tr class="border-bottom border-secondary text-white-50">
+                        <th>Job Title</th>
+                        <th>Employer</th>
+                        <th>Category</th>
+                        <th>Location</th>
+                        <th>Post Price Status</th>
+                        <th>Created At</th>
+                        <th class="text-end">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for job in pending_jobs %}
+                        <tr>
+                            <td>
+                                <strong class="text-white">{{ job.title }}</strong>
+                                <div class="small text-white-50">{{ job.get_job_type_display }}</div>
+                            </td>
+                            <td>
+                                {{ job.employer.employer_profile.company_name|default:job.employer.username }}
+                                <div class="small text-muted">{{ job.employer.email }}</div>
+                            </td>
+                            <td>{{ job.category.name }}</td>
+                            <td>{{ job.location }}</td>
+                            <td><span class="badge bg-success-gradient text-white"><i class="fa-solid fa-circle-check"></i> Paid</span></td>
+                            <td>{{ job.created_at|date:"M d, Y H:i" }}</td>
+                            <td class="text-end">
+                                <div class="d-flex justify-content-end gap-2">
+                                    <a href="{% url 'jobs:job_detail' pk=job.id %}" class="btn btn-outline-info btn-sm rounded-pill px-3" target="_blank"><i class="fa-solid fa-eye me-1"></i> Preview</a>
+                                    
+                                    <form action="{% url 'jobs:admin_approve' pk=job.id %}" method="POST" class="d-inline">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-success-gradient btn-sm rounded-pill px-3"><i class="fa-solid fa-circle-check me-1"></i> Approve</button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="7" class="text-center py-5 text-white-50">
+                                <i class="fa-solid fa-circle-check text-muted display-4 mb-3 d-block"></i>
+                                Nice work! The moderation queue is empty.
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,84 @@
+{% extends 'base.html' %}
+{% block title %}Manage Job Alerts - Bolloh{% endblock %}
+
+{% block content %}
+<div class="container my-4" style="max-width: 900px;">
+    
+    <h2 class="text-white mb-4"><i class="fa-solid fa-bell text-warning me-2 animate-bounce"></i> Job Alerts & Notifications</h2>
+    
+    <div class="row g-4">
+        
+        <!-- Create Alert Form -->
+        <div class="col-md-5">
+            <div class="glass-card p-4 shadow">
+                <h4 class="text-white mb-3"><i class="fa-solid fa-plus text-primary-gradient me-2"></i> Create Alert</h4>
+                <p class="text-white-50 small mb-4">We will scan newly approved jobs every 24 hours and email you if a matching post goes live.</p>
+                
+                <form method="POST">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label class="form-label text-white-50 small">Keywords</label>
+                        {{ form.keywords }}
+                        <div class="form-text text-muted small">Matches titles or descriptions</div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label text-white-50 small">Category</label>
+                        {{ form.category }}
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label text-white-50 small">Location</label>
+                        {{ form.location }}
+                    </div>
+
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary-gradient rounded-3"><i class="fa-solid fa-circle-plus"></i> Create Alert</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Active Alerts List -->
+        <div class="col-md-7">
+            <div class="glass-card p-4 shadow">
+                <h4 class="text-white mb-4"><i class="fa-solid fa-clock-rotate-left text-info me-2"></i> Active Alerts</h4>
+                
+                <div class="d-flex flex-column gap-3">
+                    {% for alert in alerts %}
+                        <div class="p-3 border border-secondary rounded-4 bg-dark bg-opacity-20 d-flex justify-content-between align-items-center gap-3">
+                            <div>
+                                <div class="text-white fw-medium mb-1">
+                                    {% if alert.keywords %}
+                                        Keywords: <span class="text-info">"{{ alert.keywords }}"</span>
+                                    {% else %}
+                                        Any Keywords
+                                    {% endif %}
+                                </div>
+                                <div class="small text-white-50 d-flex flex-wrap gap-3">
+                                    {% if alert.category %}
+                                        <span><i class="fa-solid fa-cube text-primary-gradient me-1"></i> {{ alert.category.name }}</span>
+                                    {% endif %}
+                                    {% if alert.location %}
+                                        <span><i class="fa-solid fa-location-dot text-danger me-1"></i> {{ alert.location }}</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <form action="{% url 'jobs:delete_alert' pk=alert.id %}" method="POST" onsubmit="return confirm('Are you sure you want to delete this alert?');">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-outline-danger btn-sm rounded-pill"><i class="fa-solid fa-trash-can"></i></button>
+                            </form>
+                        </div>
+                    {% empty %}
+                        <div class="text-center py-5 text-white-50">
+                            <i class="fa-regular fa-bell-slash text-muted display-4 mb-3 d-block"></i>
+                            You do not have any job alerts set up yet. Define query constraints on the left!
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+{% endblock %}

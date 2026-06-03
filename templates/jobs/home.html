@@ -1,0 +1,116 @@
+{% extends 'base.html' %}
+{% block title %}Bolloh - Secure Premium Job Engine{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    
+    <!-- Hero Header -->
+    <div class="row align-items-center py-5 mb-5 g-5">
+        <div class="col-lg-7 text-center text-lg-start">
+            <h1 class="display-3 fw-bold text-white mb-3 lh-1">
+                Land Your Next <br>
+                <span class="text-primary-gradient bg-clip-text">High-Impact Role</span>
+            </h1>
+            <p class="fs-5 text-white-50 mb-4 max-width-lg" style="max-width: 600px;">
+                Discover thousands of fully-vetted, high-paying jobs in engineering, product design, marketing, and finance. High-fidelity filtering, zero spam, and automated 2FA-secured pipelines.
+            </p>
+            
+            <!-- Quick Search Bar -->
+            <form action="{% url 'jobs:job_list' %}" method="GET" class="p-2 glass-card rounded-5 shadow-lg d-flex flex-column flex-md-row gap-2 max-width-md" style="max-width: 650px;">
+                <div class="d-flex align-items-center px-3 flex-grow-1">
+                    <i class="fa-solid fa-magnifying-glass text-info me-2"></i>
+                    <input type="text" name="q" class="form-control bg-transparent border-0 text-white p-2" placeholder="Keywords, titles, or skills..." style="box-shadow: none;">
+                </div>
+                <div class="d-flex align-items-center px-3 border-start border-secondary flex-grow-1">
+                    <i class="fa-solid fa-location-dot text-danger me-2"></i>
+                    <input type="text" name="location" class="form-control bg-transparent border-0 text-white p-2" placeholder="Location or 'Remote'" style="box-shadow: none;">
+                </div>
+                <button type="submit" class="btn btn-primary-gradient rounded-4 px-4 py-3"><i class="fa-solid fa-paper-plane me-1"></i> Search</button>
+            </form>
+        </div>
+        <div class="col-lg-5 d-none d-lg-block text-center position-relative">
+            <!-- Sleek Abstract Visual Panel -->
+            <div class="p-5 glass-card rounded-5 d-inline-block position-relative shadow-lg border-opacity-25" style="border-color: rgba(99, 102, 241, 0.3);">
+                <div class="position-absolute top-0 start-50 translate-middle-x bg-info rounded-circle filter-blur" style="width: 250px; height: 250px; opacity: 0.12; filter: blur(60px); z-index:-1;"></div>
+                <div class="position-absolute bottom-0 start-50 translate-middle-x bg-primary rounded-circle filter-blur" style="width: 200px; height: 200px; opacity: 0.15; filter: blur(50px); z-index:-1;"></div>
+                <div class="d-flex flex-column gap-3 align-items-start text-start" style="width: 320px;">
+                    <div class="badge bg-success-gradient px-3 py-2 rounded-pill"><i class="fa-solid fa-shield-halved me-1"></i> Verified Employers</div>
+                    <h4 class="text-white mb-1">Direct-Match Pipelines</h4>
+                    <p class="small text-white-50 mb-0">Skip applicant tracking black-holes. Every single listing connects you directly to hiring decision makers.</p>
+                    <hr class="w-100 border-secondary my-2">
+                    <div class="d-flex gap-2">
+                        <span class="badge bg-secondary text-white px-2 py-1">Python</span>
+                        <span class="badge bg-secondary text-white px-2 py-1">Django</span>
+                        <span class="badge bg-secondary text-white px-2 py-1">React</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Categories section -->
+    <div class="my-5">
+        <h3 class="text-white mb-4 text-center text-md-start"><i class="fa-solid fa-layer-group text-info me-2"></i> Browse by Category</h3>
+        <div class="row row-cols-2 row-cols-md-4 row-cols-lg-6 g-3">
+            {% for cat in categories %}
+                <div class="col">
+                    <a href="{% url 'jobs:job_list' %}?category={{ cat.id }}" class="text-decoration-none">
+                        <div class="glass-card p-3 text-center h-100 d-flex flex-column justify-content-center align-items-center gap-2 border-opacity-50">
+                            <div class="rounded-circle bg-primary bg-opacity-20 d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
+                                <i class="fa-solid fa-cube text-primary-gradient fs-4"></i>
+                            </div>
+                            <span class="text-white fw-medium small text-truncate d-block w-100">{{ cat.name }}</span>
+                        </div>
+                    </a>
+                </div>
+            {% empty %}
+                <div class="col-12 text-center text-white-50">No categories created yet. (Set them up in Django Admin!)</div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Featured jobs grid -->
+    <div class="my-5 py-3">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h3 class="text-white m-0"><i class="fa-solid fa-fire text-warning me-2"></i> Recent Job Postings</h3>
+            <a href="{% url 'jobs:job_list' %}" class="text-info text-decoration-none fw-medium">View All <i class="fa-solid fa-arrow-right-long ms-1"></i></a>
+        </div>
+        <div class="row g-4">
+            {% for job in recent_jobs %}
+                <div class="col-md-6 col-lg-4">
+                    <div class="glass-card p-4 h-100 d-flex flex-column justify-content-between">
+                        <div>
+                            <div class="d-flex justify-content-between align-items-start mb-3">
+                                <span class="badge bg-secondary text-white badge-custom">{{ job.get_job_type_display }}</span>
+                                {% if job.salary_min %}
+                                    <span class="text-success small fw-semibold">${{ job.salary_min|floatformat:0 }} - ${{ job.salary_max|floatformat:0 }}</span>
+                                {% endif %}
+                            </div>
+                            <h4 class="text-white mb-1"><a href="{% url 'jobs:job_detail' pk=job.id %}" class="text-white text-decoration-none hover-white">{{ job.title }}</a></h4>
+                            <p class="text-white-50 small mb-3">
+                                <i class="fa-solid fa-building me-1"></i> {{ job.employer.employer_profile.company_name|default:job.employer.username }}
+                            </p>
+                            <p class="text-white-50 small mb-3">
+                                <i class="fa-solid fa-location-dot me-1"></i> {{ job.location }}
+                            </p>
+                            <p class="text-white-50 small text-truncate-3 mb-0" style="display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;">
+                                {{ job.description|striptags }}
+                            </p>
+                        </div>
+                        <div class="mt-4 pt-3 border-top border-secondary d-flex align-items-center justify-content-between">
+                            <span class="small text-muted">{{ job.created_at|timesince }} ago</span>
+                            <a href="{% url 'jobs:job_detail' pk=job.id %}" class="btn btn-outline-info btn-sm rounded-pill px-3">Apply Now</a>
+                        </div>
+                    </div>
+                </div>
+            {% empty %}
+                <div class="col-12 text-center py-5 glass-card">
+                    <i class="fa-solid fa-box-open text-muted display-4 mb-3"></i>
+                    <p class="text-white-50 m-0">No jobs posted yet. Register as an Employer to post first job listing!</p>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+
+</div>
+{% endblock %}

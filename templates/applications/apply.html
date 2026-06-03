@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+{% block title %}Apply for {{ job.title }} - Bolloh{% endblock %}
+
+{% block content %}
+<div class="container my-4" style="max-width: 700px;">
+    <div class="glass-card p-5 shadow">
+        
+        <h2 class="text-white mb-2"><i class="fa-solid fa-paper-plane text-primary-gradient me-2"></i> Submit Application</h2>
+        <p class="text-white-50 mb-4">
+            You are applying for the position of <strong class="text-white">{{ job.title }}</strong> at 
+            <strong class="text-info">{{ job.employer.employer_profile.company_name }}</strong>.
+        </p>
+        
+        <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            
+            {% if has_profile_resume %}
+                <!-- Checkbox to use profile resume -->
+                <div class="p-3 border border-secondary rounded-4 bg-dark bg-opacity-30 mb-4 d-flex align-items-center gap-3">
+                    {{ form.use_profile_resume }}
+                    <label class="form-check-label text-white-50 small m-0" for="id_use_profile_resume">
+                        <i class="fa-solid fa-file-pdf text-danger me-1"></i>
+                        Use active resume from my profile: <a href="{{ seeker_profile.resume_file.url }}" target="_blank" class="text-info text-decoration-none fw-medium">{{ seeker_profile.resume_file.name }}</a>
+                    </label>
+                </div>
+            {% endif %}
+
+            <!-- Upload new resume file -->
+            <div class="mb-4" id="resume_upload_block">
+                <label class="form-label text-white-50 small">Upload Resume (PDF/DOCX)</label>
+                {{ form.resume }}
+                <div class="form-text text-muted small">Uploading a new resume will automatically extract credentials and overwrite your profile resume file.</div>
+                {% if form.resume.errors %}
+                    <div class="text-danger small mt-1">{{ form.resume.errors }}</div>
+                {% endif %}
+            </div>
+
+            <!-- Cover letter text -->
+            <div class="mb-4">
+                <label class="form-label text-white-50 small">Cover Letter</label>
+                {{ form.cover_letter }}
+                {% if form.cover_letter.errors %}
+                    <div class="text-danger small mt-1">{{ form.cover_letter.errors }}</div>
+                {% endif %}
+            </div>
+
+            <!-- Submit buttons -->
+            <div class="d-flex gap-3 justify-content-end align-items-center">
+                <a href="{% url 'jobs:job_detail' pk=job.id %}" class="btn btn-outline-secondary rounded-pill px-4">Cancel</a>
+                <button type="submit" class="btn btn-primary-gradient rounded-pill px-5">Submit Application</button>
+            </div>
+            
+        </form>
+    </div>
+</div>
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const checkbox = document.getElementById('id_use_profile_resume');
+        const uploadBlock = document.getElementById('resume_upload_block');
+        
+        if (checkbox && uploadBlock) {
+            function toggleUpload() {
+                if (checkbox.checked) {
+                    uploadBlock.style.display = 'none';
+                } else {
+                    uploadBlock.style.display = 'block';
+                }
+            }
+            checkbox.addEventListener('change', toggleUpload);
+            toggleUpload(); // Initialize
+        }
+    });
+</script>
+{% endblock %}
+
+{% endblock %}

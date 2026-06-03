@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+{% block title %}Vetted Companies - Bolloh{% endblock %}
+
+{% block content %}
+<div class="container my-4">
+    <h2 class="text-white mb-2"><i class="fa-solid fa-building text-info me-2"></i> Partner Companies</h2>
+    <p class="text-white-50 mb-5">Explore vetted organizations hiring talent and review their ratings from previous team members.</p>
+
+    <div class="row g-4">
+        {% for comp in companies %}
+            <div class="col-md-6 col-lg-4">
+                <div class="glass-card p-4 h-100 d-flex flex-column justify-content-between">
+                    <div>
+                        <!-- Logo or fallback -->
+                        <div class="d-flex align-items-center gap-3 mb-3">
+                            <div class="logo-box rounded-3 bg-dark bg-opacity-40 border border-secondary d-flex align-items-center justify-content-center overflow-hidden" style="width: 60px; height: 60px;">
+                                {% if comp.company_logo %}
+                                    <img src="{{ comp.company_logo.url }}" alt="{{ comp.company_name }} Logo" class="img-fluid">
+                                {% else %}
+                                    <i class="fa-solid fa-briefcase text-primary-gradient fs-3"></i>
+                                {% endif %}
+                            </div>
+                            <div>
+                                <h4 class="text-white mb-0">{{ comp.company_name }}</h4>
+                                {% if comp.website %}
+                                    <a href="{{ comp.website }}" target="_blank" class="small text-info text-decoration-none"><i class="fa-solid fa-earth-americas"></i> Visit Website</a>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <p class="text-white-50 small text-truncate-3 mb-0" style="display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;">
+                            {{ comp.description|default:"No company profile details provided." }}
+                        </p>
+                    </div>
+
+                    <div class="mt-4 pt-3 border-top border-secondary d-flex align-items-center justify-content-between">
+                        <div class="small">
+                            <span class="text-warning"><i class="fa-solid fa-star me-1"></i> {{ comp.reviews.all|length }} reviews</span>
+                        </div>
+                        <a href="{% url 'companies:company_detail' pk=comp.id %}" class="btn btn-outline-info rounded-pill btn-sm px-3">View Profile</a>
+                    </div>
+                </div>
+            </div>
+        {% empty %}
+            <div class="col-12 text-center py-5 glass-card">
+                <i class="fa-solid fa-building-circle-exclamation text-muted display-4 mb-3"></i>
+                <p class="text-white-50 m-0">No companies registered on this portal yet.</p>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

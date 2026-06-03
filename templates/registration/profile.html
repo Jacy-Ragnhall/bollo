@@ -1,0 +1,162 @@
+{% extends 'base.html' %}
+{% block title %}My Profile - Bolloh{% endblock %}
+
+{% block content %}
+<div class="container my-4">
+    <div class="row g-4">
+        
+        <!-- Left Column: Profile Settings Form -->
+        <div class="col-lg-6">
+            <div class="glass-card p-4 shadow">
+                <h3 class="text-white mb-4">
+                    <i class="fa-solid fa-id-card text-info me-2"></i> 
+                    {% if user.is_job_seeker %}Candidate Settings{% else %}Company Details{% endif %}
+                </h3>
+
+                <form method="POST" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    
+                    {% if user.is_job_seeker %}
+                        <!-- Job Seeker Fields -->
+                        <div class="mb-3">
+                            <label class="form-label text-white-50 small">Phone Number</label>
+                            {{ form.phone }}
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label text-white-50 small">Professional Skills</label>
+                            {{ form.skills }}
+                            <div class="form-text text-muted small">Comma-separated keywords (e.g. Python, SQL, AWS)</div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label text-white-50 small">Bio & Experience Summary</label>
+                            {{ form.bio }}
+                        </div>
+                        <div class="mb-4">
+                            <label class="form-label text-white-50 small">Resume File (PDF/DOCX)</label>
+                            {{ form.resume_file }}
+                            {% if profile.resume_file %}
+                                <div class="mt-2 text-white-50 small">
+                                    <i class="fa-solid fa-file-pdf text-danger me-1"></i>
+                                    Active Resume: <a href="{{ profile.resume_file.url }}" target="_blank" class="text-info text-decoration-none fw-medium">{{ profile.resume_file.name }}</a>
+                                </div>
+                            {% endif %}
+                            
+                            <!-- Resume parsed data readout if exists -->
+                            {% if profile.resume_parsed_name or profile.resume_parsed_email %}
+                                <div class="mt-3 p-3 rounded-4 bg-dark bg-opacity-30 border border-secondary">
+                                    <h6 class="text-white mb-2"><i class="fa-solid fa-brain text-info me-1"></i> Parsed Resume Context</h6>
+                                    <div class="small text-white-50">
+                                        <div>Parsed Name: <strong class="text-white">{{ profile.resume_parsed_name|default:"Not found" }}</strong></div>
+                                        <div>Parsed Email: <strong class="text-white">{{ profile.resume_parsed_email|default:"Not found" }}</strong></div>
+                                    </div>
+                                </div>
+                            {% endif %}
+                        </div>
+
+                    {% else %}
+                        <!-- Employer Fields -->
+                        <div class="mb-3">
+                            <label class="form-label text-white-50 small">Company Name</label>
+                            {{ form.company_name }}
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label text-white-50 small">Corporate Website</label>
+                            {{ form.website }}
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label text-white-50 small">Company Logo</label>
+                            {{ form.company_logo }}
+                            {% if profile.company_logo %}
+                                <div class="mt-2">
+                                    <img src="{{ profile.company_logo.url }}" alt="Company Logo" class="img-thumbnail bg-transparent border-secondary" style="max-height: 80px;">
+                                </div>
+                            {% endif %}
+                        </div>
+                        <div class="mb-4">
+                            <label class="form-label text-white-50 small">Company Bio & Overview</label>
+                            {{ form.description }}
+                        </div>
+                    {% endif %}
+
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary-gradient rounded-3"><i class="fa-solid fa-circle-check me-1"></i> Save Profile Details</button>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+
+        <!-- Right Column: 2FA & Candidate Specific Lists -->
+        <div class="col-lg-6 d-flex flex-column gap-4">
+            
+            <!-- 2FA Device Management -->
+            <div class="glass-card p-4 shadow">
+                <h4 class="text-white mb-2"><i class="fa-solid fa-shield-halved text-success me-2"></i> Two-Factor Authentication (2FA)</h4>
+                <p class="text-white-50 small mb-3">Secure your login with a custom TOTP authenticator device. When active, login requires entering an OTP 6-digit verification token.</p>
+                
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <span class="small text-white-50">Status:</span>
+                        {% if has_2fa %}
+                            <span class="badge bg-success ms-2"><i class="fa-solid fa-circle-check"></i> Enabled / Active</span>
+                        {% else %}
+                            <span class="badge bg-secondary ms-2"><i class="fa-solid fa-circle-xmark"></i> Disabled</span>
+                        {% endif %}
+                    </div>
+                    {% if has_2fa %}
+                        <form action="{% url 'users:otp_disable' %}" method="POST" onsubmit="return confirm('Disable two-factor authentication?');">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-outline-danger btn-sm rounded-pill"><i class="fa-solid fa-shield-xmark"></i> Disable 2FA</button>
+                        </form>
+                    {% else %}
+                        <a href="{% url 'users:otp_setup' %}" class="btn btn-success-gradient btn-sm rounded-pill"><i class="fa-solid fa-shield-heart"></i> Enable 2FA</a>
+                    {% endif %}
+                </div>
+            </div>
+
+            {% if user.is_job_seeker %}
+                
+                <!-- Applications List -->
+                <div class="glass-card p-4 shadow">
+                    <h4 class="text-white mb-3"><i class="fa-solid fa-paper-plane text-primary-gradient me-2"></i> Sent Applications</h4>
+                    
+                    <div class="d-flex flex-column gap-2" style="max-height: 250px; overflow-y: auto;">
+                        {% for app in user.applications.all %}
+                            <div class="p-3 border border-secondary rounded-4 bg-dark bg-opacity-20 d-flex justify-content-between align-items-center">
+                                <div>
+                                    <strong class="text-white d-block">{{ app.job.title }}</strong>
+                                    <span class="small text-muted">{{ app.created_at|date:"M d, Y" }}</span>
+                                </div>
+                                <span class="badge {{ app.get_status_class }}">{{ app.get_status_display }}</span>
+                            </div>
+                        {% empty %}
+                            <p class="text-white-50 text-center py-3 m-0 small">You haven't submitted any job applications yet.</p>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- Saved Jobs List -->
+                <div class="glass-card p-4 shadow">
+                    <h4 class="text-white mb-3"><i class="fa-solid fa-bookmark text-warning me-2 animate-pulse"></i> Bookmarked Positions</h4>
+                    
+                    <div class="d-flex flex-column gap-2" style="max-height: 250px; overflow-y: auto;">
+                        {% for saved in user.saved_jobs.all %}
+                            <div class="p-3 border border-secondary rounded-4 bg-dark bg-opacity-20 d-flex justify-content-between align-items-center">
+                                <div>
+                                    <strong class="text-white d-block"><a href="{% url 'jobs:job_detail' pk=saved.job.id %}" class="text-white text-decoration-none hover-white">{{ saved.job.title }}</a></strong>
+                                    <span class="small text-white-50">{{ saved.job.employer.employer_profile.company_name }}</span>
+                                </div>
+                                <a href="{% url 'jobs:toggle_save' pk=saved.job.id %}" class="btn btn-outline-warning btn-sm rounded-pill"><i class="fa-solid fa-bookmark"></i></a>
+                            </div>
+                        {% empty %}
+                            <p class="text-white-50 text-center py-3 m-0 small">No bookmarked vacancies.</p>
+                        {% endfor %}
+                    </div>
+                </div>
+
+            {% endif %}
+
+        </div>
+    </div>
+</div>
+{% endblock %}

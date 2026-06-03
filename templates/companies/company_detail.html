@@ -1,0 +1,124 @@
+{% extends 'base.html' %}
+{% block title %}{{ company.company_name }} - Bolloh{% endblock %}
+
+{% block content %}
+<div class="container my-4">
+    
+    <!-- Profile Card Header -->
+    <div class="glass-card p-5 mb-5 shadow border-opacity-50">
+        <div class="d-flex flex-column flex-md-row gap-4 align-items-center align-items-md-start">
+            <div class="logo-box rounded-4 bg-dark bg-opacity-40 border border-secondary d-flex align-items-center justify-content-center overflow-hidden" style="width: 100px; height: 100px; min-width: 100px;">
+                {% if company.company_logo %}
+                    <img src="{{ company.company_logo.url }}" alt="{{ company.company_name }} Logo" class="img-fluid">
+                {% else %}
+                    <i class="fa-solid fa-briefcase text-primary-gradient fs-1"></i>
+                {% endif %}
+            </div>
+            
+            <div class="text-center text-md-start flex-grow-1">
+                <h1 class="text-white mb-2">{{ company.company_name }}</h1>
+                <div class="d-flex flex-wrap justify-content-center justify-content-md-start gap-3 text-white-50 small mb-3">
+                    {% if company.website %}
+                        <span><a href="{{ company.website }}" target="_blank" class="text-info text-decoration-none"><i class="fa-solid fa-earth-americas me-1"></i> Visit Website</a></span>
+                    {% endif %}
+                    <span><i class="fa-solid fa-star text-warning me-1"></i> {{ avg_rating|floatformat:1 }} Stars Average ({{ reviews|length }} reviews)</span>
+                </div>
+                <p class="text-white-50 lh-lg mb-0 max-width-lg" style="max-width: 800px;">
+                    {{ company.description|default:"No company details provided by employer." }}
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        
+        <!-- Left Column: Active jobs list -->
+        <div class="col-lg-6">
+            <div class="glass-card p-4 h-100">
+                <h3 class="text-white mb-4"><i class="fa-solid fa-fire text-warning me-2 animate-pulse"></i> Open Positions</h3>
+                
+                <div class="d-flex flex-column gap-3">
+                    {% for job in jobs %}
+                        <div class="p-3 border border-secondary rounded-4 bg-dark bg-opacity-20 d-flex justify-content-between align-items-center">
+                            <div>
+                                <strong class="text-white d-block"><a href="{% url 'jobs:job_detail' pk=job.id %}" class="text-white text-decoration-none hover-white">{{ job.title }}</a></strong>
+                                <span class="small text-white-50"><i class="fa-solid fa-location-dot me-1"></i> {{ job.location }}</span>
+                            </div>
+                            <span class="badge bg-secondary text-white">{{ job.get_job_type_display }}</span>
+                        </div>
+                    {% empty %}
+                        <p class="text-white-50 text-center py-5 m-0 small">
+                            <i class="fa-solid fa-briefcase text-muted fs-3 mb-2 d-block"></i>
+                            No active job postings live at the moment.
+                        </p>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Column: Reviews & ratings -->
+        <div class="col-lg-6">
+            <div class="glass-card p-4 mb-4">
+                <h3 class="text-white mb-4"><i class="fa-solid fa-star text-warning me-2"></i> Employee Reviews</h3>
+                
+                <div class="d-flex flex-column gap-3 mb-4" style="max-height: 400px; overflow-y: auto;">
+                    {% for rev in reviews %}
+                        <div class="p-3 border border-secondary rounded-4 bg-dark bg-opacity-20">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <strong class="text-white small">{{ rev.seeker.username }}</strong>
+                                <div class="stars-display text-warning small">
+                                    {% for i in "12345"|make_list %}
+                                        {% if forloop.counter <= rev.rating %}
+                                            <i class="fa-solid fa-star"></i>
+                                        {% else %}
+                                            <i class="fa-regular fa-star"></i>
+                                        {% endif %}
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            <p class="text-white-50 small mb-0">{{ rev.review_text }}</p>
+                        </div>
+                    {% empty %}
+                        <p class="text-white-50 text-center py-4 m-0 small">No reviews written yet. Be the first to share your thoughts!</p>
+                    {% endfor %}
+                </div>
+
+                <!-- Write Review section -->
+                {% if review_form %}
+                    <hr class="border-secondary my-4" id="write-review">
+                    <h5 class="text-white mb-3"><i class="fa-solid fa-pen-nib text-info me-2"></i> Share Your Experience</h5>
+                    
+                    <form action="{% url 'companies:submit_review' pk=company.id %}" method="POST">
+                        {% csrf_token %}
+                        
+                        <div class="mb-3">
+                            <label class="form-label text-white-50 small d-block">Your Rating</label>
+                            
+                            <!-- Star Rating Widget -->
+                            <div class="star-rating">
+                                <input type="radio" id="star5" name="rating" value="5" required /><label for="star5"><i class="fa-solid fa-star"></i></label>
+                                <input type="radio" id="star4" name="rating" value="4" required /><label for="star4"><i class="fa-solid fa-star"></i></label>
+                                <input type="radio" id="star3" name="rating" value="3" required /><label for="star3"><i class="fa-solid fa-star"></i></label>
+                                <input type="radio" id="star2" name="rating" value="2" required /><label for="star2"><i class="fa-solid fa-star"></i></label>
+                                <input type="radio" id="star1" name="rating" value="1" required /><label for="star1"><i class="fa-solid fa-star"></i></label>
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="form-label text-white-50 small">Review Comment</label>
+                            {{ review_form.review_text }}
+                        </div>
+
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary-gradient rounded-3 btn-sm"><i class="fa-solid fa-paper-plane"></i> Publish Review</button>
+                        </div>
+                    </form>
+                {% elif user_has_reviewed %}
+                    <div class="alert alert-secondary py-2 small text-center m-0"><i class="fa-solid fa-circle-info"></i> You have already reviewed this company.</div>
+                {% endif %}
+            </div>
+        </div>
+
+    </div>
+</div>
+{% endblock %}

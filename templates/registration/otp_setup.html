@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+{% block title %}Setup 2FA - Bolloh{% endblock %}
+
+{% block content %}
+<div class="container my-5 d-flex justify-content-center align-items-center">
+    <div class="glass-card p-5 shadow w-100" style="max-width: 500px;">
+        
+        <h2 class="text-white mb-2 text-center"><i class="fa-solid fa-shield-halved text-success me-2"></i> Enable 2FA Security</h2>
+        <p class="text-white-50 small mb-4 text-center">Add cryptographic verification security parameters to protect your account.</p>
+
+        <!-- Instructions -->
+        <ol class="text-white-50 small mb-4 px-3 d-flex flex-column gap-2">
+            <li>Open your authenticator app (Google Authenticator, Authy, or Duo).</li>
+            <li>Scan the QR code below, or manually type the setup code.</li>
+            <li>Enter the active 6-digit token code to confirm.</li>
+        </ol>
+
+        <!-- QR Code -->
+        <div class="text-center mb-4 p-3 bg-white d-inline-block rounded-4 mx-auto d-block" style="width: 250px;">
+            <img src="{{ qr_url }}" alt="2FA QR Code" class="img-fluid rounded-3">
+        </div>
+
+        <!-- Setup Key readout -->
+        <div class="mb-4 text-center">
+            <span class="small text-white-50">Manual Setup Secret Key:</span>
+            <div class="p-2 border border-secondary rounded-3 bg-dark bg-opacity-30 mt-1">
+                <code class="text-info fs-5 letter-spacing-md">{{ device.hex_key }}</code>
+            </div>
+        </div>
+
+        <!-- Verification token form -->
+        <form method="POST">
+            {% csrf_token %}
+            
+            <div class="mb-4">
+                <label class="form-label text-white-50 small d-block text-center mb-2">Authenticator Code</label>
+                {{ form.token }}
+                {% if form.token.errors %}
+                    <div class="text-danger small mt-1 text-center">{{ form.token.errors }}</div>
+                {% endif %}
+            </div>
+
+            <div class="d-flex gap-3 justify-content-center">
+                <a href="{% url 'users:profile' %}" class="btn btn-outline-secondary rounded-pill px-4 btn-sm">Cancel</a>
+                <button type="submit" class="btn btn-success-gradient rounded-pill px-5 btn-sm"><i class="fa-solid fa-shield-heart me-1"></i> Verify & Enable</button>
+            </div>
+
+        </form>
+    </div>
+</div>
+{% endblock %}
